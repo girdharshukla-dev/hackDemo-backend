@@ -15,7 +15,7 @@ async function insertTaskForUser(userID, title) {
     "INSERT INTO tasks (user_id, title) VALUES (?, ?)",
     [userID, title]
   );
-  return result.insertId;
+  return result;
 }
 
 async function getAllTasksForUser(userID) {
