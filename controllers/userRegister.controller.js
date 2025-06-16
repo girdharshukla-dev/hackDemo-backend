@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 const {insertUserIntoDb, getUserFromDbByEmail} = require("../models/userQueries")
 const bcryptjs = require("bcryptjs");
 
@@ -29,7 +28,6 @@ async function userRegister(req,resp){
     }
 }
 
-// eslint-disable-next-line no-undef
 module.exports = {
     userRegister
 }

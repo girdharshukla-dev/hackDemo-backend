@@ -11,6 +11,7 @@ app.use(cookieParser());
 
 const { userRouter } = require("./routes/user.routes");
 const { authMiddleware } = require("./middleware/authMiddleware");
+const { taskRouter } = require("./routes/task.routes");
 
 app.get("/health",(req,resp)=>{
     console.log("Req received ",req);
@@ -18,10 +19,12 @@ app.get("/health",(req,resp)=>{
 })
 
 app.use("/api/user",userRouter);
+app.use("/api/task",taskRouter);
 
 //this api is for testing for the authMiddleware
 app.get("/test",authMiddleware,(req,resp)=>{
     console.log("Middle ware worked ...." + req.user.id + "  " + req.user.email);
+    console.log(req.user);
     return resp.status(200).json({message : "Hello" , email: req.user.email});
 })
 
