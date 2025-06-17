@@ -7,7 +7,7 @@ db.query(createTableQuery)
         console.log("Tasks table created ...");
     })
     .catch((err)=>{
-        console.log("Error in creating tasks table ....");
+        console.log("Error in creating tasks table ...." , err);
     });
 
 async function insertTaskForUser(userID, title) {
@@ -34,18 +34,20 @@ async function getTaskById(taskID) {
   return rows[0];
 }
 
-async function updateTaskStatus(taskID, isCompleted) {
-  await db.query(
+async function updateTaskStatusById(taskID, isCompleted) {
+  const [result] = await db.query(
     "UPDATE tasks SET is_completed = ? WHERE id = ?",
     [isCompleted, taskID]
   );
+  return result.affectedRows;
 }
 
-async function deleteTask(taskID) {
-  await db.query(
+async function deleteTaskById(taskID) {
+  const [result] = await db.query(
     "DELETE FROM tasks WHERE id = ?",
     [taskID]
   );
+  return result.affectedRows;
 }
 
 async function getTasksByStatus(userID, isCompleted) {
@@ -61,7 +63,7 @@ module.exports = {
   insertTaskForUser,
   getAllTasksForUser,
   getTaskById,
-  updateTaskStatus,
-  deleteTask,
+  updateTaskStatusById,
+  deleteTaskById,
   getTasksByStatus
 }
