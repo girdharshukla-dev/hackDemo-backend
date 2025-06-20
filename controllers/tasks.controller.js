@@ -13,11 +13,11 @@ async function addTask(req, resp) {
         }
         const result = await insertTaskForUser(userID, task);
         // console.log(result);
-        if (typeof result.insertId !== "number") {
+        if (typeof result.id !== "number") {
             return resp.status(400).json({ message: "Error in inserting task" });
         }
-        console.log("Task added : " + task + " with taskId " + result.insertId);
-        return resp.status(200).json({ message: "Task added", taskId: result.insertId });
+        console.log("Task added : " + task + " with taskId " + result.id);
+        return resp.status(200).json({ message: "Task added", taskId: result.id });
     } catch (err) {
         console.log("Error in inserting task " + err.message);
         return resp.status(500).json({ message: "Error in adding task" });
