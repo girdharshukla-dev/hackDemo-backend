@@ -7,7 +7,7 @@ const app = express();
 require("./initDB")
 
 app.use(cors({
-    origin : "https://hack-dun-gamma.vercel.app/",
+    origin : "https://hack-dun-gamma.vercel.app",
     credentials : true
 }));
 app.use(express.json());
