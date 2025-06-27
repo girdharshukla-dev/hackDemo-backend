@@ -7,6 +7,7 @@ const {
   getTaskById,
 } = require("../models/taskQueries");
 
+const {suggestions} = require("../services/ai.services")
 
 // POST /tasks -> create task
 async function addTask(req, resp) {
@@ -142,18 +143,26 @@ async function getTaskByIdSingle(req, resp) {
 
 
 // GET /suggestions
-// async function getSuggestions(req, resp) {
-//   try {
-//     const userId = req.user.id;
-//     const allTasks = await getAllTasksByUser(userId);
-
-//     const aiSuggestions = await suggestions(allTasks);
-//     return resp.status(200).json({ suggestions: aiSuggestions });
-//   } catch (err) {
-//     console.error("Error generating suggestions:", err.message);
-//     return resp.status(500).json({ message: "Error generating suggestions" });
-//   }
-// }
+async function getSuggestions(req, resp) {
+  try {
+    const userId = req.user.id;
+    if(!userId){
+      return resp.status(404).json({message : "User not found"});
+    }
+    const allTasks = await getAllTasksByUser(userId);
+    if(!allTasks){
+      return resp.status(404).json({message : "No tasks present"});
+    }
+    const aiSuggestions = await suggestions(allTasks);
+    if(!aiSuggestions){
+      return resp.status(500).json({message : "Error in generating ai responses "});
+    }
+    return resp.status(200).json({ suggestions: aiSuggestions });
+  } catch (err) {
+    console.error("Error generating suggestions:", err.message);
+    return resp.status(500).json({ message: "Error generating suggestions" });
+  }
+}
 
 module.exports = {
   addTask,
@@ -161,5 +170,5 @@ module.exports = {
   updateTask,
   getAllTasks,
   getTaskByIdSingle,
-  // getSuggestions,
+  getSuggestions,
 };

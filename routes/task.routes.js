@@ -18,7 +18,7 @@ taskRouter.delete("/delete/:id", deleteTask);
 taskRouter.patch("/update/:id", updateTask);
 taskRouter.get("/getall", getAllTasks);
 taskRouter.get("/get/:id" , getTaskByIdSingle);
-// taskRouter.get("/suggestions", getSuggestions);
+taskRouter.get("/suggestions", getSuggestions);
 
 
 module.exports= {
