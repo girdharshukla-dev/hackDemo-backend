@@ -1,7 +1,5 @@
 const { Pool } = require("pg");
 
-const { Pool } = require("pg");
-
 const isProduction = process.env.DB_NODE_ENV === "production";
 
 const pool = new Pool(

@@ -15,7 +15,6 @@ const { authMiddleware } = require("./middleware/authMiddleware");
 const { taskRouter } = require("./routes/task.routes");
 
 app.get("/health",(req,resp)=>{
-    console.log("Req received ",req);
     return resp.json({message : "health-check"});
 })
 
