@@ -27,8 +27,8 @@ async function userLogin(req, resp) {
         const jwtToken = setUserToken({id: user.id , email: user.email});
         resp.cookie("jwtToken", jwtToken, {
             httpOnly: true,
-            sameSite: "Strict",
-            secure: process.env.NODE_ENV==="production"
+            sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+            secure: process.env.NODE_ENV === "production"
         });
         return resp.status(200).json({ message: "Login success" , user : {id:user.id , email: user.email}, token:jwtToken });
     } catch (err) {
