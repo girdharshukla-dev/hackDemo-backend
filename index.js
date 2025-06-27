@@ -6,10 +6,16 @@ const PORT = process.env.PORT || 8000;
 const app = express();
 require("./initDB")
 
-app.use(cors({
-    origin : "https://hack-dun-gamma.vercel.app",
-    credentials : true
-}));
+const corsOptions = {
+  origin: "https://hack-dun-gamma.vercel.app",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+
 app.use(express.json());
 app.use(cookieParser());
 
