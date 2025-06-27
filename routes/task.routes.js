@@ -9,9 +9,9 @@ taskRouter.use(authMiddleware);
 taskRouter.post("/add", addTask);
 taskRouter.delete("/delete/:id", deleteTask);
 taskRouter.patch("/update/:id", updateTask);
-taskRouter.get("/suggestions", getSuggestions);
+// taskRouter.get("/suggestions", getSuggestions);
 
 
-module.exports = {
+module.exports= {
     taskRouter
 }

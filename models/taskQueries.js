@@ -5,7 +5,8 @@ const createTableQuery = `
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    duedate VARCHAR(255),
+    duedate TIMESTAMP,
+    completed_at TIMESTAMP,
     priority VARCHAR(50),
     tag VARCHAR(100),
     is_completed BOOLEAN DEFAULT FALSE,
@@ -82,40 +83,21 @@ async function getTaskById(taskId) {
   return result.rows[0];
 }
 
-async function updateTaskById(taskId, updates) {
-  const fields = [];
-  const values = [];
-  let index = 1;
-
-  for (const key in updates) {
-    fields.push(`${key} = $${index}`);
-    values.push(updates[key]);
-    index++;
-  }
-
-  values.push(taskId);
-
-  const result = await db.query(
-    `UPDATE tasks SET ${fields.join(", ")} WHERE id = $${index} RETURNING *`,
-    values
-  );
-  return result.rows[0];
-}
 
 async function updateTaskStatus(taskId, isCompleted) {
-  const result = await db.query(
-    `UPDATE tasks SET is_completed = $1 WHERE id = $2`,
-    [isCompleted, taskId]
-  );
-  return result.rowCount;
-}
-
-async function deleteTaskById(taskId) {
-  const result = await db.query(
-    `DELETE FROM tasks WHERE id = $1`,
-    [taskId]
-  );
-  return result.rowCount;
+  if (isCompleted) {
+    const result = await db.query(
+      `UPDATE tasks SET is_completed = true, completed_at = CURRENT_TIMESTAMP WHERE id = $1`,
+      [taskId]
+    );
+    return result.rowCount;
+  } else {
+    const result = await db.query(
+      `UPDATE tasks SET is_completed = false, completed_at = NULL WHERE id = $1`,
+      [taskId]
+    );
+    return result.rowCount;
+  }
 }
 
 async function getTasksByStatus(userId, isCompleted) {
@@ -126,13 +108,20 @@ async function getTasksByStatus(userId, isCompleted) {
   return result.rows;
 }
 
+async function deleteTaskById(taskId) {
+  const result = await db.query(
+    `DELETE FROM tasks WHERE id = $1`,
+    [taskId]
+  );
+  return result.rowCount;
+}
+
 module.exports = {
   insertTaskWithDetails,
   getAllTasksByUser,
   getAssignedTasks,
   getTasksByGroup,
   getTaskById,
-  updateTaskById,
   updateTaskStatus,
   deleteTaskById,
   getTasksByStatus,
