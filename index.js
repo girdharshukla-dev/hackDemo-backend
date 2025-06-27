@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors")
 const PORT = 8000;
 const app = express();
+require("./initDB")
 
 app.use(cors());
 app.use(express.json());

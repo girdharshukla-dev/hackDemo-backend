@@ -15,7 +15,7 @@ function setUserToken({ id, email }) {
 
 function decodeToken(token) {
     try {
-        return jwt.verify(token, secretkey);
+        return jwt.verify(token, secretKey);
     }catch(err) {
         console.log("Decoding jwt token failed ...." + err);
         return null;

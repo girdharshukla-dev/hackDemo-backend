@@ -9,14 +9,16 @@ const createTableQuery = `
   );
 `;
 
-(async () => {
+async function createUsersTable() {
   try {
     await db.query(createTableQuery);
     console.log("Users table created...");
   } catch (err) {
     console.error("Error creating users table:", err);
   }
-})();
+}
+
+
 async function insertUserIntoDb(user) {
   const result = await db.query(
     "INSERT INTO users(username, email, password) VALUES ($1, $2, $3) RETURNING id",
@@ -40,4 +42,5 @@ module.exports = {
   insertUserIntoDb,
   getUserFromDbByEmail,
   getUserFromDbByUserID,
+  createUsersTable
 };

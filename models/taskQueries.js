@@ -17,19 +17,20 @@ const createTableQuery = `
     group_id INT,
 
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL,
-    FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE
+    FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL
   );
 `;
 
-(async () => {
+//FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE
+
+async function createTasksTable() {
   try {
     await db.query(createTableQuery);
     console.log("Tasks table created...");
   } catch (err) {
     console.error("Error creating tasks table:", err);
   }
-})();
+}
 
 async function insertTaskWithDetails({
   title,
@@ -108,6 +109,33 @@ async function getTasksByStatus(userId, isCompleted) {
   return result.rows;
 }
 
+async function updateTaskRow(
+  taskId,
+  title,
+  description,
+  duedate,
+  priority,
+  tag,
+  is_completed
+) {
+  const query = `
+    UPDATE tasks
+    SET title = $1,
+        description = $2,
+        duedate = $3,
+        priority = $4,
+        tag = $5,
+        is_completed = $6
+    WHERE id = $7
+  `;
+
+  const values = [title, description, duedate, priority, tag, is_completed, taskId];
+
+  const result = await db.query(query, values);
+  return result.rowCount;
+}
+
+
 async function deleteTaskById(taskId) {
   const result = await db.query(
     `DELETE FROM tasks WHERE id = $1`,
@@ -125,4 +153,6 @@ module.exports = {
   updateTaskStatus,
   deleteTaskById,
   getTasksByStatus,
+  createTasksTable,
+  updateTaskRow
 };

@@ -1,4 +1,4 @@
-const {insertUserIntoDb , } = require("../models/userQueries");
+const {insertUserIntoDb , getUserFromDbByEmail} = require("../models/userQueries");
 const bcryptjs = require("bcryptjs");
 
 

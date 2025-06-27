@@ -3,9 +3,10 @@ const {
   deleteTaskById,
   updateTaskStatus,
   getAllTasksByUser,
+  updateTaskRow,
+  getTaskById,
 } = require("../models/taskQueries");
 
-const { suggestions } = require("../services/ai.service");
 
 // POST /tasks -> create task
 async function addTask(req, resp) {
@@ -57,45 +58,108 @@ async function deleteTask(req, resp) {
   }
 }
 
-// PATCH /tasks/:id → mark complete/incomplete
+// PATCH /tasks/:id -> update fields 
 async function updateTask(req, resp) {
   try {
     const taskId = req.params.id;
-    const { isCompleted } = req.body;
+    const {
+      title,
+      description,
+      duedate,
+      priority,
+      tag,
+      is_completed
+    } = req.body;
 
-    if (typeof isCompleted !== "boolean") {
-      return resp.status(400).json({ message: "isCompleted must be boolean" });
+    if (typeof is_completed !== "boolean") {
+      return resp.status(400).json({ message: "is_completed must be boolean" });
     }
 
-    const affectedRows = await updateTaskStatus(taskId, isCompleted);
+    const affectedRows = await updateTaskRow(
+      taskId,
+      title,
+      description,
+      duedate,
+      priority,
+      tag,
+      is_completed
+    );
+
     if (affectedRows === 0) {
       return resp.status(404).json({ message: "No task updated" });
     }
 
-    return resp.status(200).json({ message: "Task status updated" });
+    return resp.status(200).json({ message: "Task updated successfully" });
   } catch (err) {
-    console.error("Error updating task status:", err.message);
-    return resp.status(500).json({ message: "Error updating task" });
+    console.error("Update error:", err.message);
+    return resp.status(500).json({ message: "Internal server error" });
   }
 }
+
+async function getAllTasks(req, resp) {
+  try {
+    const { id: userId } = req.user;
+    if (!userId) {
+      return resp.status(400).json({ message: "Missing user " });
+    }
+    const ans = await getAllTasksByUser(userId);
+    if (!ans) {
+      return resp.status(404).json({ message: "No tasks found" });
+    }
+    return resp.status(200).json({ tasks: ans });
+  } catch (err) {
+    console.log("There is some error in get all tasks ");
+    return resp.status(500).json({ message: "There is some internal error " });
+  }
+}
+
+//this expects task id in the params
+async function getTaskByIdSingle(req, resp) {
+  try {
+    const taskId = req.params.id;
+    const {id:userId} = req.user;
+    if (!taskId) {
+      return resp.status(404).json({ message: "No taskId" });
+    }
+    if(!userId){
+      return resp.status(404).json({message : "No user found"});
+    }
+    const ans = await getTaskById(taskId);
+    if(ans.created_by !== userId){
+      // console.log("User Id = " , userId);
+      // console.log("created by = " , ans.created_by);
+      return resp.status(401).json({message : "User not authorized"});
+    }
+    if (!ans) {
+      return resp.status(404).json({ message: "Task not found" });
+    }
+    return resp.status(200).json({task : ans});
+  }catch(err){
+    console.log("Error in fetching task by id ..." + err.message);
+    return resp.status(500).json({message : "Error in fetching task "});
+  }
+}
+
 
 // GET /suggestions
-async function getSuggestions(req, resp) {
-  try {
-    const userId = req.user.id;
-    const allTasks = await getAllTasksByUser(userId);
+// async function getSuggestions(req, resp) {
+//   try {
+//     const userId = req.user.id;
+//     const allTasks = await getAllTasksByUser(userId);
 
-    const aiSuggestions = await suggestions(allTasks);
-    return resp.status(200).json({ suggestions: aiSuggestions });
-  } catch (err) {
-    console.error("Error generating suggestions:", err.message);
-    return resp.status(500).json({ message: "Error generating suggestions" });
-  }
-}
+//     const aiSuggestions = await suggestions(allTasks);
+//     return resp.status(200).json({ suggestions: aiSuggestions });
+//   } catch (err) {
+//     console.error("Error generating suggestions:", err.message);
+//     return resp.status(500).json({ message: "Error generating suggestions" });
+//   }
+// }
 
 module.exports = {
   addTask,
   deleteTask,
   updateTask,
-  getSuggestions,
+  getAllTasks,
+  getTaskByIdSingle,
+  // getSuggestions,
 };
