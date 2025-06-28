@@ -192,4 +192,5 @@ module.exports = {
   getAllTasks,
   getTaskByIdSingle,
   getSuggestions,
+  updateStatus,
 };

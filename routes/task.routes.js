@@ -9,6 +9,7 @@ const {
     getSuggestions , 
     getAllTasks, 
     getTaskByIdSingle,
+    updateStatus,
 } = require("../controllers/tasks.controller")
 
 taskRouter.use(authMiddleware);
@@ -18,6 +19,8 @@ taskRouter.post("/add", addTask);
 taskRouter.delete("/delete/:id", deleteTask);
 
 taskRouter.patch("/update/:id", updateTask);
+
+taskRouter.patch("/updateStatus/:id" , updateStatus);
 
 taskRouter.get("/getall", getAllTasks);
 
