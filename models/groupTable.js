@@ -19,4 +19,15 @@ async function createGroupsTable() {
   }
 }
 
-module.exports = { createGroupsTable };
+async function createGroup(name, createdBy) {
+  const result = await db.query(
+    `INSERT INTO groups (name, created_by) VALUES ($1, $2) RETURNING id`,
+    [name, createdBy]
+  );
+  return result.rows[0].id;
+}
+
+module.exports = {
+  createGroupsTable,
+  createGroup,
+};

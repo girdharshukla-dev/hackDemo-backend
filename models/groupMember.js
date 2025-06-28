@@ -22,4 +22,14 @@ async function createGroupMembersTable() {
   }
 }
 
-module.exports = { createGroupMembersTable };
+async function addUserToGroup(groupId, userId, role = "member") {
+  await db.query(
+    `INSERT INTO group_members (group_id, user_id, role) VALUES ($1, $2, $3)`,
+    [groupId, userId, role]
+  );
+}
+
+module.exports = {
+  createGroupMembersTable,
+  addUserToGroup
+};
