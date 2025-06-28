@@ -10,7 +10,7 @@ const {
     getAllTasks, 
     getTaskByIdSingle,
     updateStatus,
-} = require("../controllers/tasks.controller")
+} = require("../controllers/tasks.controller");
 
 taskRouter.use(authMiddleware);
 
@@ -27,7 +27,6 @@ taskRouter.get("/getall", getAllTasks);
 taskRouter.get("/get/:id" , getTaskByIdSingle);
 
 taskRouter.get("/suggestions", getSuggestions);
-
 
 module.exports= {
     taskRouter
