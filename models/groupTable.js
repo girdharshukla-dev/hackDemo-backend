@@ -27,7 +27,14 @@ async function createGroup(name, createdBy) {
   return result.rows[0].id;
 }
 
+async function getAdminId(groupId){
+  const ans = await db.query(`SELECT created_by FROM groups WHERE id=$1`,[groupId]);
+  // console.log(ans);
+  return ans.rows[0].created_by;
+}
+
 module.exports = {
   createGroupsTable,
   createGroup,
+  getAdminId,
 };
