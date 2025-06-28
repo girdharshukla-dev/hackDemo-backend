@@ -7,9 +7,9 @@ const {
   getTaskById,
 } = require("../models/taskQueries");
 
-const {suggestions} = require("../services/ai.services")
+const { suggestions } = require("../services/ai.services")
 
-// POST /tasks -> create task
+// POST /task -> create task
 async function addTask(req, resp) {
   try {
     const { id: userId } = req.user;
@@ -41,7 +41,7 @@ async function addTask(req, resp) {
   }
 }
 
-// DELETE /tasks/:id
+// DELETE /task/:id
 async function deleteTask(req, resp) {
   try {
     const taskId = req.params.id;
@@ -59,7 +59,7 @@ async function deleteTask(req, resp) {
   }
 }
 
-// PATCH /tasks/:id -> update fields 
+// PATCH /update/:id -> update fields 
 async function updateTask(req, resp) {
   try {
     const taskId = req.params.id;
@@ -69,12 +69,7 @@ async function updateTask(req, resp) {
       duedate,
       priority,
       tag,
-      is_completed
     } = req.body;
-
-    if (typeof is_completed !== "boolean") {
-      return resp.status(400).json({ message: "is_completed must be boolean" });
-    }
 
     const affectedRows = await updateTaskRow(
       taskId,
@@ -83,7 +78,6 @@ async function updateTask(req, resp) {
       duedate,
       priority,
       tag,
-      is_completed
     );
 
     if (affectedRows === 0) {
@@ -94,6 +88,33 @@ async function updateTask(req, resp) {
   } catch (err) {
     console.error("Update error:", err.message);
     return resp.status(500).json({ message: "Internal server error" });
+  }
+}
+
+// patch in updateStatus/:id
+async function updateStatus(req, resp) {
+  try {
+    const { id: userId } = req.user;
+    const { isCompleted } = req.body;
+    if(typeof isCompleted !== "boolean"){
+      return resp.status(400).json({message : "isCompleted must be boolean"})
+    }
+    const taskId = req.params.id;
+    const task = await getTaskById(taskId);
+    if(!task){
+      return resp.status(404).json({message : "Task not found "});
+    }
+    if(task.created_by !== userId){
+      return resp.status(401).json({message : "User not authorized"});
+    }
+    const affectedRows = await updateTaskStatus(taskId , isCompleted);
+    if(affectedRows === 0){
+      return resp.status(500).json({message : "No changes in rows made "});
+    }
+    return resp.status(200).json({message : `Status changed to ${isCompleted}`});
+  }catch(err){
+    console.log("Error in changing task status.... " + err.message);
+    return resp.status(500).json({message : "Error in updating "});
   }
 }
 
@@ -118,26 +139,26 @@ async function getAllTasks(req, resp) {
 async function getTaskByIdSingle(req, resp) {
   try {
     const taskId = req.params.id;
-    const {id:userId} = req.user;
+    const { id: userId } = req.user;
     if (!taskId) {
       return resp.status(404).json({ message: "No taskId" });
     }
-    if(!userId){
-      return resp.status(404).json({message : "No user found"});
+    if (!userId) {
+      return resp.status(404).json({ message: "No user found" });
     }
     const ans = await getTaskById(taskId);
-    if(ans.created_by !== userId){
+    if (ans.created_by !== userId) {
       // console.log("User Id = " , userId);
       // console.log("created by = " , ans.created_by);
-      return resp.status(401).json({message : "User not authorized"});
+      return resp.status(401).json({ message: "User not authorized" });
     }
     if (!ans) {
       return resp.status(404).json({ message: "Task not found" });
     }
-    return resp.status(200).json({task : ans});
-  }catch(err){
+    return resp.status(200).json({ task: ans });
+  } catch (err) {
     console.log("Error in fetching task by id ..." + err.message);
-    return resp.status(500).json({message : "Error in fetching task "});
+    return resp.status(500).json({ message: "Error in fetching task " });
   }
 }
 
@@ -146,16 +167,16 @@ async function getTaskByIdSingle(req, resp) {
 async function getSuggestions(req, resp) {
   try {
     const userId = req.user.id;
-    if(!userId){
-      return resp.status(404).json({message : "User not found"});
+    if (!userId) {
+      return resp.status(404).json({ message: "User not found" });
     }
     const allTasks = await getAllTasksByUser(userId);
-    if(!allTasks){
-      return resp.status(404).json({message : "No tasks present"});
+    if (!allTasks) {
+      return resp.status(404).json({ message: "No tasks present" });
     }
     const aiSuggestions = await suggestions(allTasks);
-    if(!aiSuggestions){
-      return resp.status(500).json({message : "Error in generating ai responses "});
+    if (!aiSuggestions) {
+      return resp.status(500).json({ message: "Error in generating ai responses " });
     }
     return resp.status(200).json({ suggestions: aiSuggestions });
   } catch (err) {

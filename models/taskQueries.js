@@ -17,11 +17,11 @@ const createTableQuery = `
     group_id INT,
 
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL
+    FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE
   );
 `;
 
-//FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE
 
 async function createTasksTable() {
   try {
