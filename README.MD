@@ -161,6 +161,10 @@ Return the task with "id" only if created by the user
 #### GET `/api/task/suggestions`
 Get AI-generated suggestions based on the user's tasks.
 
+# Note :
+- The live task collaboration feature is currently under development.
+Check out the feat/live-collab branch for the following experimental APIs and logic.
+
 #### POST `/api/group/create`
 **Request Body :**
 ```json
